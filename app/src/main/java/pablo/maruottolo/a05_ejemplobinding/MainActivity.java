@@ -11,9 +11,13 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
+
+import java.util.ArrayList;
 
 import pablo.maruottolo.a05_ejemplobinding.databinding.ActivityMainBinding;
 import pablo.maruottolo.a05_ejemplobinding.modelo.Alumno;
@@ -23,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     private ActivityResultLauncher<Intent> addAlumnoLauncher;
+    private ArrayList<Alumno> listaAlumno;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.toolbar);
+
+        listaAlumno = new ArrayList<>();
 
         inicializarLaucher();
 
@@ -55,6 +62,13 @@ public class MainActivity extends AppCompatActivity {
                         if(result.getResultCode() == RESULT_OK){
                             if(result.getData() != null && result.getData().getExtras()!=null){
                                 Alumno alumno = (Alumno)result.getData().getExtras().getSerializable("ALUMNO");
+                                listaAlumno.add(alumno);
+                                mostarAlumnos();
+                                //FALTA MOSTRAR INFORMACION!!
+                                //1.Un elemento para mostrar la informacion --->TextView
+                                //2.Un contenedor de datos a mostrar ---> Lista alumnos
+                                //3.Un contenedor donde mostrar caca uno de los elementos --->Scroll
+                                //4.La logica para mostrar los elementos
                             }else{
                                 Toast.makeText(MainActivity.this,"NO HAY INFORMACIÓN",Toast.LENGTH_SHORT).show();
                             }
@@ -64,5 +78,25 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
         );
+    }
+
+    private void mostarAlumnos() {
+        binding.contentMain.contenedorMain.removeAllViews();
+        for(Alumno a : listaAlumno){
+            LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
+
+            View alumnoView = layoutInflater.inflate(R.layout.alumno_fila_view,null);
+            TextView lbNombre = alumnoView.findViewById(R.id.lbNombreAlumnoView);
+            TextView lbApellidos = alumnoView.findViewById(R.id.lbApellidosAlumnosView);
+            TextView lbCiclos = alumnoView.findViewById(R.id.lbCicloAlumnoView);
+            TextView lbGrupo = alumnoView.findViewById(R.id.lbGrupoAlumnoView);
+
+            lbNombre.setText(a.getNombre());
+            lbApellidos.setText(a.getApellidos());
+            lbCiclos.setText(a.getCiclo());
+            lbGrupo.setText(String.valueOf(a.getGrupo()));
+
+            binding.contentMain.contenedorMain.addView(alumnoView);
+        }
     }
 }
